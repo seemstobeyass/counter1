@@ -19,17 +19,18 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ACR
-        run: |
-          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} \
-            -u ${{ secrets.ACR_USERNAME }} --password-stdin
+        run: az acr login --name nodejsoncounterdocker
+
       - name: Build image
         run: |
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest .
+          docker build -t nodejsoncounterdocker.azurecr.io/node-app:latest .
+
       - name: Push image
         run: |
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest
+          docker push nodejsoncounterdocker.azurecr.io/node-app:latest
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME_C }}
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/node-app:latest
+          images: nodejsoncounterdocker.azurecr.io/node-app:latest
